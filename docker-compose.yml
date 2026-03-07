@@ -1,0 +1,230 @@
+x-common-env: &common-env
+  SOURCE_DB_HOST: db-source
+  SOURCE_DB_PORT: "5432"
+  SOURCE_DB_NAME: legacybridge_source
+  SOURCE_DB_USER: postgres
+  SOURCE_DB_PASSWORD: postgres
+  TARGET_DB_HOST: db-target
+  TARGET_DB_PORT: "5432"
+  TARGET_DB_NAME: legacybridge_target
+  TARGET_DB_USER: postgres
+  TARGET_DB_PASSWORD: postgres
+
+services:
+  # ─── Layer 0: Databases ───────────────────────────────────────
+  db-source:
+    image: postgres:15-alpine
+    container_name: lb-source-db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: legacybridge_source
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - source-data:/var/lib/postgresql/data
+      - ./backend/data/source_seed.sql:/docker-entrypoint-initdb.d/01_seed.sql
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  db-target:
+    image: postgres:15-alpine
+    container_name: lb-target-db
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: legacybridge_target
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - target-data:/var/lib/postgresql/data
+      - ./backend/data/target_seed.sql:/docker-entrypoint-initdb.d/01_seed.sql
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  airflow-db:
+    image: postgres:15-alpine
+    container_name: lb-airflow-db
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+    volumes:
+      - airflow-db-data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ─── Layer 1: Airflow ─────────────────────────────────────────
+  airflow-webserver:
+    image: apache/airflow:2.8.1-python3.11
+    container_name: lb-airflow-webserver
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      <<: *common-env
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY:-}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY:-legacybridge-secret}
+      _AIRFLOW_DB_MIGRATE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/plugins:/opt/airflow/plugins
+      - airflow-logs:/opt/airflow/logs
+    command: >
+      bash -c "airflow db migrate && airflow users create
+      --username admin --password admin --firstname Admin
+      --lastname User --role Admin --email admin@localhost
+      || true && airflow webserver"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  airflow-scheduler:
+    image: apache/airflow:2.8.1-python3.11
+    container_name: lb-airflow-scheduler
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY:-}
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/plugins:/opt/airflow/plugins
+      - airflow-logs:/opt/airflow/logs
+    command: >
+      bash -c "airflow db migrate && airflow scheduler"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  # ─── Layer 1: Spark ────────────────────────────────────────────
+  spark-master:
+    image: apache/spark:3.5.0
+    container_name: lb-spark-master
+    ports:
+      - "7077:7077"
+      - "8081:8080"
+    environment:
+      SPARK_MODE: master
+      SPARK_MASTER_HOST: spark-master
+    command: >
+      bash -c "/opt/spark/sbin/start-master.sh --host 0.0.0.0 --port 7077 --webui-port 8080 && tail -f /opt/spark/logs/*"
+    entrypoint: []
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  spark-worker:
+    image: apache/spark:3.5.0
+    container_name: lb-spark-worker
+    depends_on:
+      - spark-master
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_MEMORY: 1G
+      SPARK_WORKER_CORES: 2
+    command: >
+      bash -c "/opt/spark/sbin/start-worker.sh spark://spark-master:7077 && tail -f /opt/spark/logs/*"
+    entrypoint: []
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+
+  # ─── Layer 2–3: Backend ────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lb-backend
+    depends_on:
+      db-source:
+        condition: service_healthy
+      db-target:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      <<: *common-env
+      DEMO_MODE: ${DEMO_MODE:-true}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SPARK_MASTER_URL: spark://spark-master:7077
+      MAX_TOKENS_PER_RUN: ${MAX_TOKENS_PER_RUN:-10000}
+      MAX_RUNS_PER_DAY: ${MAX_RUNS_PER_DAY:-20}
+    volumes:
+      - ./backend:/app
+      - airflow-logs:/app/airflow-logs:ro
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  # ─── Layer 4: Frontend ─────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: lb-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    environment:
+      VITE_API_URL: http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+volumes:
+  source-data:
+  target-data:
+  airflow-db-data:
+  airflow-logs:

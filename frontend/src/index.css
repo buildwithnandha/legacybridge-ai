@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Neutral zinc-based backgrounds — Vercel/Linear aesthetic */
+  --bg-primary:      #09090B;
+  --bg-secondary:    #111113;
+  --bg-tertiary:     #18181B;
+  --bg-hover:        #27272A;
+  --border-primary:  #27272A;
+  --border-accent:   #3F3F46;
+
+  /* Warm neutral text hierarchy */
+  --text-primary:    #FAFAFA;
+  --text-secondary:  #A1A1AA;
+  --text-muted:      #71717A;
+  --text-code:       #A5B4FC;
+
+  /* Indigo accent — restrained, professional */
+  --accent-cyan:     #818CF8;
+  --accent-cyan-dim: #6366F1;
+  --accent-blue:     #6366F1;
+
+  /* Severity — slightly desaturated for sophistication */
+  --critical:        #EF4444;
+  --critical-bg:     #1C1111;
+  --critical-glow:   rgba(239,68,68,0.1);
+  --warning:         #F59E0B;
+  --warning-bg:      #1C1709;
+  --warning-glow:    rgba(245,158,11,0.1);
+  --healthy:         #22C55E;
+  --healthy-bg:      #0D1A12;
+  --healthy-glow:    rgba(34,197,94,0.1);
+  --info:            #6366F1;
+}
+
+* {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  margin: 0;
+  overflow: hidden;
+}
+
+.font-mono, code, .font-code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Dot grid background */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(39,39,42,0.5) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Global scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-accent); }
+
+/* Agent panel scrollbar */
+.agent-scroll::-webkit-scrollbar { width: 4px; }
+.agent-scroll::-webkit-scrollbar-track { background: var(--bg-primary); }
+.agent-scroll::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 2px; }
+.agent-scroll::-webkit-scrollbar-thumb:hover { background: var(--border-accent); }
+
+/* Pulse animations */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0); }
+  50% { box-shadow: 0 0 12px 2px rgba(99,102,241,0.15); }
+}
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Red flash for critical detection */
+@keyframes red-flash {
+  0% { background: rgba(239,68,68,0.06); }
+  100% { background: transparent; }
+}
+.red-flash {
+  animation: red-flash 400ms ease-out;
+}
+
+/* Slide in from right */
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.slide-in-right {
+  animation: slide-in-right 300ms ease-out;
+}
+
+/* Slide in from top */
+@keyframes slide-in-top {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.slide-in-top {
+  animation: slide-in-top 300ms ease-out;
+}
+
+/* Fade in */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.fade-in {
+  animation: fade-in 500ms ease-out;
+}
+
+/* Score pulse */
+@keyframes score-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+.score-pulse {
+  animation: score-pulse 600ms ease-out;
+}
+
+/* Typing cursor blink */
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.blink-cursor {
+  animation: blink-cursor 500ms step-end infinite;
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-hover) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Button glow on hover */
+.btn-glow:hover {
+  box-shadow: 0 0 20px rgba(99,102,241,0.2);
+}
+
+/* Toast slide */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.toast-in {
+  animation: toast-in 300ms ease-out;
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+}
