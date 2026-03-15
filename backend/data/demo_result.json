@@ -1,0 +1,270 @@
+{
+  "recon": {
+    "tables": {
+      "vendor": {
+        "schema_diff": {
+          "table": "vendor",
+          "source_column_count": 12,
+          "target_column_count": 11,
+          "missing_columns": [
+            {"column": "vendor_tier", "type": "character varying(20)", "nullable": true}
+          ],
+          "type_mismatches": [
+            {"column": "active_flag", "source_type": "character(1)", "target_type": "boolean"}
+          ],
+          "extra_columns": [],
+          "severity": "CRITICAL"
+        },
+        "row_recon": {
+          "table": "vendor",
+          "source_count": 2341,
+          "target_count": 2341,
+          "delta": 0,
+          "delta_pct": 0.0,
+          "checksum_match": false,
+          "status": "MISMATCH"
+        },
+        "cdc_analysis": {
+          "table": "vendor",
+          "total_events": 4231,
+          "captured": 3384,
+          "missed": 847,
+          "gap_rate": 20.02,
+          "gap_patterns": [
+            {"reason": "BATCH_JOB_UPDATE", "count": 612, "description": "Bulk updates via batch job bypass row-level CDC triggers"},
+            {"reason": "TRIGGER_DISABLED_WINDOW", "count": 235, "description": "CDC trigger was disabled during a maintenance window causing events to be missed"}
+          ]
+        },
+        "issues": [
+          {"type": "MISSING_COLUMN", "severity": "CRITICAL", "detail": "Column 'vendor_tier' (character varying(20)) missing in target"},
+          {"type": "TYPE_MISMATCH", "severity": "CRITICAL", "detail": "Column 'active_flag': source=character(1) target=boolean"},
+          {"type": "CDC_GAP", "severity": "CRITICAL", "detail": "847 events missed (20.02% gap rate)"}
+        ],
+        "status": "CRITICAL"
+      },
+      "inventory": {
+        "schema_diff": {
+          "table": "inventory",
+          "source_column_count": 15,
+          "target_column_count": 15,
+          "missing_columns": [],
+          "type_mismatches": [
+            {"column": "unit_cost", "source_type": "numeric(10,4)", "target_type": "double precision"}
+          ],
+          "extra_columns": [],
+          "severity": "WARNING"
+        },
+        "row_recon": {
+          "table": "inventory",
+          "source_count": 12445,
+          "target_count": 12445,
+          "delta": 0,
+          "delta_pct": 0.0,
+          "checksum_match": false,
+          "status": "MISMATCH"
+        },
+        "cdc_analysis": {
+          "table": "inventory",
+          "total_events": 18932,
+          "captured": 18932,
+          "missed": 0,
+          "gap_rate": 0.0,
+          "gap_patterns": []
+        },
+        "issues": [
+          {"type": "TYPE_MISMATCH", "severity": "WARNING", "detail": "Column 'unit_cost': source=numeric(10,4) target=double precision"}
+        ],
+        "status": "WARNING"
+      },
+      "inventory_transaction": {
+        "schema_diff": {
+          "table": "inventory_transaction",
+          "source_column_count": 10,
+          "target_column_count": 10,
+          "missing_columns": [
+            {"column": "status_code", "type": "character(3)", "nullable": false}
+          ],
+          "type_mismatches": [],
+          "extra_columns": [
+            {"column": "is_deleted", "type": "boolean", "nullable": true}
+          ],
+          "severity": "CRITICAL"
+        },
+        "row_recon": {
+          "table": "inventory_transaction",
+          "source_count": 25,
+          "target_count": 19,
+          "delta": 6,
+          "delta_pct": 24.0,
+          "checksum_match": false,
+          "status": "MISMATCH"
+        },
+        "cdc_analysis": {
+          "table": "inventory_transaction",
+          "total_events": 3201,
+          "captured": 3201,
+          "missed": 0,
+          "gap_rate": 0.0,
+          "gap_patterns": []
+        },
+        "issues": [
+          {"type": "MISSING_COLUMN", "severity": "CRITICAL", "detail": "Column 'status_code' (character(3)) missing in target"},
+          {"type": "EXTRA_COLUMN", "severity": "WARNING", "detail": "Column 'is_deleted' (boolean) only in target"},
+          {"type": "ROW_COUNT_MISMATCH", "severity": "CRITICAL", "detail": "source=25 target=19 delta=6 (24.0%)"}
+        ],
+        "status": "CRITICAL"
+      },
+      "supplier_contract": {
+        "schema_diff": {
+          "table": "supplier_contract",
+          "source_column_count": 9,
+          "target_column_count": 9,
+          "missing_columns": [],
+          "type_mismatches": [],
+          "extra_columns": [],
+          "severity": "HEALTHY",
+          "note": "Schema matches. Data-level NULL vs empty string divergence detected in row checksums."
+        },
+        "row_recon": {
+          "table": "supplier_contract",
+          "source_count": 3891,
+          "target_count": 3891,
+          "delta": 0,
+          "delta_pct": 0.0,
+          "checksum_match": false,
+          "status": "MISMATCH"
+        },
+        "cdc_analysis": {
+          "table": "supplier_contract",
+          "total_events": 5120,
+          "captured": 5120,
+          "missed": 0,
+          "gap_rate": 0.0,
+          "gap_patterns": []
+        },
+        "issues": [
+          {"type": "DATA_MISMATCH", "severity": "WARNING", "detail": "Checksum mismatch: NULL vs empty string divergence in text fields"}
+        ],
+        "status": "WARNING"
+      },
+      "purchase_order": {
+        "schema_diff": {
+          "table": "purchase_order",
+          "source_column_count": 11,
+          "target_column_count": 11,
+          "missing_columns": [],
+          "type_mismatches": [],
+          "extra_columns": [],
+          "severity": "HEALTHY"
+        },
+        "row_recon": {
+          "table": "purchase_order",
+          "source_count": 8932,
+          "target_count": 8932,
+          "delta": 0,
+          "delta_pct": 0.0,
+          "checksum_match": true,
+          "status": "MATCH"
+        },
+        "cdc_analysis": {
+          "table": "purchase_order",
+          "total_events": 12105,
+          "captured": 12105,
+          "missed": 0,
+          "gap_rate": 0.0,
+          "gap_patterns": []
+        },
+        "issues": [],
+        "status": "HEALTHY"
+      }
+    },
+    "issues_found": 9,
+    "critical_count": 5,
+    "warning_count": 4,
+    "health_score": 10
+  },
+  "agent_steps": [
+    {"event": "agent_start", "data": {"run_id": "demo", "tables": ["vendor", "inventory", "inventory_transaction", "supplier_contract", "purchase_order"]}},
+
+    {"event": "thinking", "data": {"content": "Investigating vendor table...", "turn": 0}},
+    {"event": "tool_call", "data": {"tool": "get_schema_diff", "input": {"table_name": "vendor"}, "turn": 0}},
+    {"event": "tool_result", "data": {"tool": "get_schema_diff", "result": {"table": "vendor", "missing_columns": [{"column": "vendor_tier", "type": "character varying(20)"}], "type_mismatches": [{"column": "active_flag", "source_type": "character(1)", "target_type": "boolean"}], "extra_columns": [], "severity": "CRITICAL"}, "turn": 0}},
+    {"event": "tool_call", "data": {"tool": "get_row_recon", "input": {"table_name": "vendor"}, "turn": 0}},
+    {"event": "tool_result", "data": {"tool": "get_row_recon", "result": {"table": "vendor", "source_count": 2341, "target_count": 2341, "delta": 0, "delta_pct": 0.0, "checksum_match": false, "status": "MISMATCH"}, "turn": 0}},
+    {"event": "tool_call", "data": {"tool": "get_cdc_events", "input": {"table_name": "vendor"}, "turn": 0}},
+    {"event": "tool_result", "data": {"tool": "get_cdc_events", "result": {"table": "vendor", "total_events": 4231, "captured": 3384, "missed": 847, "gap_rate": 20.02}, "turn": 0}},
+    {"event": "thinking", "data": {"content": "Classifying root causes for vendor...", "turn": 0}},
+    {"event": "tool_call", "data": {"tool": "classify_root_cause", "input": {"evidence": {"table_name": "vendor", "mismatch_type": "MISSING_COLUMN"}}, "turn": 0}},
+    {"event": "tool_result", "data": {"tool": "classify_root_cause", "result": {"root_cause": "CDC_SCHEMA_DRIFT", "confidence": 0.94, "affected_rows": 2341, "recommended_fix": "Add missing column to target schema and backfill from source. Update CDC configuration to include the column in change payloads.", "priority": "P1", "table": "vendor"}, "turn": 0}},
+    {"event": "root_cause", "data": {"root_cause": "CDC_SCHEMA_DRIFT", "confidence": 0.94, "affected_rows": 2341, "recommended_fix": "Add missing column to target schema and backfill from source. Update CDC configuration to include the column in change payloads.", "priority": "P1", "table": "vendor"}},
+    {"event": "tool_call", "data": {"tool": "classify_root_cause", "input": {"evidence": {"table_name": "vendor", "mismatch_type": "TYPE_COERCION_BOOL"}}, "turn": 0}},
+    {"event": "tool_result", "data": {"tool": "classify_root_cause", "result": {"root_cause": "TYPE_COERCION", "confidence": 0.91, "affected_rows": 2341, "recommended_fix": "Standardize column type across source and target. Add explicit CHAR\u2192BOOLEAN mapping in the ETL transform layer.", "priority": "P2", "table": "vendor"}, "turn": 0}},
+    {"event": "root_cause", "data": {"root_cause": "TYPE_COERCION", "confidence": 0.91, "affected_rows": 2341, "recommended_fix": "Standardize column type across source and target. Add explicit CHAR\u2192BOOLEAN mapping in the ETL transform layer.", "priority": "P2", "table": "vendor"}},
+    {"event": "tool_call", "data": {"tool": "classify_root_cause", "input": {"evidence": {"table_name": "vendor", "mismatch_type": "CDC_TRIGGER_SKIP"}}, "turn": 0}},
+    {"event": "tool_result", "data": {"tool": "classify_root_cause", "result": {"root_cause": "CDC_TRIGGER_GAP", "confidence": 0.96, "affected_rows": 847, "recommended_fix": "Modify CDC triggers to capture BATCH_JOB updates. Consider using log-based CDC instead of trigger-based to capture all DML.", "priority": "P1", "table": "vendor"}, "turn": 0}},
+    {"event": "root_cause", "data": {"root_cause": "CDC_TRIGGER_GAP", "confidence": 0.96, "affected_rows": 847, "recommended_fix": "Modify CDC triggers to capture BATCH_JOB updates. Consider using log-based CDC instead of trigger-based to capture all DML.", "priority": "P1", "table": "vendor"}},
+
+    {"event": "thinking", "data": {"content": "Investigating inventory table...", "turn": 1}},
+    {"event": "tool_call", "data": {"tool": "get_schema_diff", "input": {"table_name": "inventory"}, "turn": 1}},
+    {"event": "tool_result", "data": {"tool": "get_schema_diff", "result": {"table": "inventory", "missing_columns": [], "type_mismatches": [{"column": "unit_cost", "source_type": "numeric(10,4)", "target_type": "double precision"}], "extra_columns": [], "severity": "WARNING"}, "turn": 1}},
+    {"event": "tool_call", "data": {"tool": "get_row_recon", "input": {"table_name": "inventory"}, "turn": 1}},
+    {"event": "tool_result", "data": {"tool": "get_row_recon", "result": {"table": "inventory", "source_count": 12445, "target_count": 12445, "delta": 0, "delta_pct": 0.0, "checksum_match": false, "status": "MISMATCH"}, "turn": 1}},
+    {"event": "tool_call", "data": {"tool": "get_cdc_events", "input": {"table_name": "inventory"}, "turn": 1}},
+    {"event": "tool_result", "data": {"tool": "get_cdc_events", "result": {"table": "inventory", "total_events": 18932, "captured": 18932, "missed": 0, "gap_rate": 0.0}, "turn": 1}},
+    {"event": "thinking", "data": {"content": "Classifying root causes for inventory...", "turn": 1}},
+    {"event": "tool_call", "data": {"tool": "classify_root_cause", "input": {"evidence": {"table_name": "inventory", "mismatch_type": "FLOAT_ROUNDING"}}, "turn": 1}},
+    {"event": "tool_result", "data": {"tool": "classify_root_cause", "result": {"root_cause": "TYPE_COERCION", "confidence": 0.88, "affected_rows": 12445, "recommended_fix": "Change target column from FLOAT to DECIMAL with matching precision. Re-run ETL to restore precision.", "priority": "P2", "table": "inventory"}, "turn": 1}},
+    {"event": "root_cause", "data": {"root_cause": "TYPE_COERCION", "confidence": 0.88, "affected_rows": 12445, "recommended_fix": "Change target column from FLOAT to DECIMAL with matching precision. Re-run ETL to restore precision.", "priority": "P2", "table": "inventory"}},
+
+    {"event": "thinking", "data": {"content": "Investigating inventory_transaction table...", "turn": 2}},
+    {"event": "tool_call", "data": {"tool": "get_schema_diff", "input": {"table_name": "inventory_transaction"}, "turn": 2}},
+    {"event": "tool_result", "data": {"tool": "get_schema_diff", "result": {"table": "inventory_transaction", "missing_columns": [{"column": "status_code", "type": "character(3)"}], "type_mismatches": [], "extra_columns": [{"column": "is_deleted", "type": "boolean"}], "severity": "CRITICAL"}, "turn": 2}},
+    {"event": "tool_call", "data": {"tool": "get_row_recon", "input": {"table_name": "inventory_transaction"}, "turn": 2}},
+    {"event": "tool_result", "data": {"tool": "get_row_recon", "result": {"table": "inventory_transaction", "source_count": 25, "target_count": 19, "delta": 6, "delta_pct": 24.0, "checksum_match": false, "status": "MISMATCH"}, "turn": 2}},
+    {"event": "tool_call", "data": {"tool": "get_cdc_events", "input": {"table_name": "inventory_transaction"}, "turn": 2}},
+    {"event": "tool_result", "data": {"tool": "get_cdc_events", "result": {"table": "inventory_transaction", "total_events": 3201, "captured": 3201, "missed": 0, "gap_rate": 0.0}, "turn": 2}},
+    {"event": "thinking", "data": {"content": "Classifying root causes for inventory_transaction...", "turn": 2}},
+    {"event": "tool_call", "data": {"tool": "classify_root_cause", "input": {"evidence": {"table_name": "inventory_transaction", "mismatch_type": "MISSING_COLUMN"}}, "turn": 2}},
+    {"event": "tool_result", "data": {"tool": "classify_root_cause", "result": {"root_cause": "CDC_SCHEMA_DRIFT", "confidence": 0.94, "affected_rows": 25, "recommended_fix": "Add missing column to target schema and backfill from source. Update CDC configuration to include the column in change payloads.", "priority": "P1", "table": "inventory_transaction"}, "turn": 2}},
+    {"event": "root_cause", "data": {"root_cause": "CDC_SCHEMA_DRIFT", "confidence": 0.94, "affected_rows": 25, "recommended_fix": "Add missing column to target schema and backfill from source. Update CDC configuration to include the column in change payloads.", "priority": "P1", "table": "inventory_transaction"}},
+    {"event": "tool_call", "data": {"tool": "classify_root_cause", "input": {"evidence": {"table_name": "inventory_transaction", "mismatch_type": "SOFT_DELETE"}}, "turn": 2}},
+    {"event": "tool_result", "data": {"tool": "classify_root_cause", "result": {"root_cause": "SOFT_DELETE_MISMATCH", "confidence": 0.95, "affected_rows": 6, "recommended_fix": "Include soft-deleted rows in target with is_deleted flag. Modify ETL to preserve all rows and map status_code DEL to is_deleted=true.", "priority": "P1", "table": "inventory_transaction"}, "turn": 2}},
+    {"event": "root_cause", "data": {"root_cause": "SOFT_DELETE_MISMATCH", "confidence": 0.95, "affected_rows": 6, "recommended_fix": "Include soft-deleted rows in target with is_deleted flag. Modify ETL to preserve all rows and map status_code DEL to is_deleted=true.", "priority": "P1", "table": "inventory_transaction"}},
+
+    {"event": "thinking", "data": {"content": "Investigating supplier_contract table...", "turn": 3}},
+    {"event": "tool_call", "data": {"tool": "get_schema_diff", "input": {"table_name": "supplier_contract"}, "turn": 3}},
+    {"event": "tool_result", "data": {"tool": "get_schema_diff", "result": {"table": "supplier_contract", "missing_columns": [], "type_mismatches": [], "extra_columns": [], "severity": "HEALTHY", "note": "Schema matches. Data-level NULL vs empty string divergence detected."}, "turn": 3}},
+    {"event": "tool_call", "data": {"tool": "get_row_recon", "input": {"table_name": "supplier_contract"}, "turn": 3}},
+    {"event": "tool_result", "data": {"tool": "get_row_recon", "result": {"table": "supplier_contract", "source_count": 3891, "target_count": 3891, "delta": 0, "delta_pct": 0.0, "checksum_match": false, "status": "MISMATCH"}, "turn": 3}},
+    {"event": "tool_call", "data": {"tool": "get_cdc_events", "input": {"table_name": "supplier_contract"}, "turn": 3}},
+    {"event": "tool_result", "data": {"tool": "get_cdc_events", "result": {"table": "supplier_contract", "total_events": 5120, "captured": 5120, "missed": 0, "gap_rate": 0.0}, "turn": 3}},
+    {"event": "thinking", "data": {"content": "Classifying root causes for supplier_contract...", "turn": 3}},
+    {"event": "tool_call", "data": {"tool": "classify_root_cause", "input": {"evidence": {"table_name": "supplier_contract", "mismatch_type": "NULL_EMPTY"}}, "turn": 3}},
+    {"event": "tool_result", "data": {"tool": "classify_root_cause", "result": {"root_cause": "NULL_EMPTY_MISMATCH", "confidence": 0.89, "affected_rows": 3891, "recommended_fix": "Standardize NULL handling: treat empty strings as NULL consistently in the transform layer. Apply COALESCE/NULLIF in ETL.", "priority": "P3", "table": "supplier_contract"}, "turn": 3}},
+    {"event": "root_cause", "data": {"root_cause": "NULL_EMPTY_MISMATCH", "confidence": 0.89, "affected_rows": 3891, "recommended_fix": "Standardize NULL handling: treat empty strings as NULL consistently in the transform layer. Apply COALESCE/NULLIF in ETL.", "priority": "P3", "table": "supplier_contract"}},
+
+    {"event": "thinking", "data": {"content": "Investigating purchase_order table...", "turn": 4}},
+    {"event": "tool_call", "data": {"tool": "get_schema_diff", "input": {"table_name": "purchase_order"}, "turn": 4}},
+    {"event": "tool_result", "data": {"tool": "get_schema_diff", "result": {"table": "purchase_order", "missing_columns": [], "type_mismatches": [], "extra_columns": [], "severity": "HEALTHY"}, "turn": 4}},
+    {"event": "tool_call", "data": {"tool": "get_row_recon", "input": {"table_name": "purchase_order"}, "turn": 4}},
+    {"event": "tool_result", "data": {"tool": "get_row_recon", "result": {"table": "purchase_order", "source_count": 8932, "target_count": 8932, "delta": 0, "delta_pct": 0.0, "checksum_match": true, "status": "MATCH"}, "turn": 4}},
+    {"event": "tool_call", "data": {"tool": "get_cdc_events", "input": {"table_name": "purchase_order"}, "turn": 4}},
+    {"event": "tool_result", "data": {"tool": "get_cdc_events", "result": {"table": "purchase_order", "total_events": 12105, "captured": 12105, "missed": 0, "gap_rate": 0.0}, "turn": 4}},
+    {"event": "thinking", "data": {"content": "Classifying root causes for purchase_order...", "turn": 4}},
+    {"event": "tool_call", "data": {"tool": "classify_root_cause", "input": {"evidence": {"table_name": "purchase_order", "mismatch_type": "HEALTHY"}}, "turn": 4}},
+    {"event": "tool_result", "data": {"tool": "classify_root_cause", "result": {"root_cause": "HEALTHY", "confidence": 0.99, "affected_rows": 0, "recommended_fix": "No action required. Table is healthy.", "priority": "P3", "table": "purchase_order"}, "turn": 4}},
+    {"event": "root_cause", "data": {"root_cause": "HEALTHY", "confidence": 0.99, "affected_rows": 0, "recommended_fix": "No action required. Table is healthy.", "priority": "P3", "table": "purchase_order"}},
+
+    {"event": "thinking", "data": {"content": "All 5 tables investigated. Calculating final health score...", "turn": 5}},
+    {"event": "agent_complete", "data": {"run_id": "demo", "health_score": 10, "critical_count": 4, "warning_count": 2, "total_issues": 6, "root_causes_found": 7, "root_causes": [
+      {"root_cause": "CDC_SCHEMA_DRIFT", "confidence": 0.94, "affected_rows": 2341, "recommended_fix": "Add missing column to target schema and backfill from source. Update CDC configuration to include the column in change payloads.", "priority": "P1", "table": "vendor"},
+      {"root_cause": "TYPE_COERCION", "confidence": 0.91, "affected_rows": 2341, "recommended_fix": "Standardize column type across source and target. Add explicit CHAR\u2192BOOLEAN mapping in the ETL transform layer.", "priority": "P2", "table": "vendor"},
+      {"root_cause": "CDC_TRIGGER_GAP", "confidence": 0.96, "affected_rows": 847, "recommended_fix": "Modify CDC triggers to capture BATCH_JOB updates. Consider using log-based CDC instead of trigger-based to capture all DML.", "priority": "P1", "table": "vendor"},
+      {"root_cause": "TYPE_COERCION", "confidence": 0.88, "affected_rows": 12445, "recommended_fix": "Change target column from FLOAT to DECIMAL with matching precision. Re-run ETL to restore precision.", "priority": "P2", "table": "inventory"},
+      {"root_cause": "CDC_SCHEMA_DRIFT", "confidence": 0.94, "affected_rows": 25, "recommended_fix": "Add missing column to target schema and backfill from source. Update CDC configuration to include the column in change payloads.", "priority": "P1", "table": "inventory_transaction"},
+      {"root_cause": "SOFT_DELETE_MISMATCH", "confidence": 0.95, "affected_rows": 6, "recommended_fix": "Include soft-deleted rows in target with is_deleted flag. Modify ETL to preserve all rows and map status_code DEL to is_deleted=true.", "priority": "P1", "table": "inventory_transaction"},
+      {"root_cause": "NULL_EMPTY_MISMATCH", "confidence": 0.89, "affected_rows": 3891, "recommended_fix": "Standardize NULL handling: treat empty strings as NULL consistently in the transform layer. Apply COALESCE/NULLIF in ETL.", "priority": "P3", "table": "supplier_contract"},
+      {"root_cause": "HEALTHY", "confidence": 0.99, "affected_rows": 0, "recommended_fix": "No action required. Table is healthy.", "priority": "P3", "table": "purchase_order"}
+    ], "total_tokens": 0, "duration_seconds": 28.3}}
+  ]
+}
